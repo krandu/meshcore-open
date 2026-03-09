@@ -1,0 +1,145 @@
+diff --git a/lib/widgets/quick_switch_bar.dart b/lib/widgets/quick_switch_bar.dart
+--- a/lib/widgets/quick_switch_bar.dart
++++ b/lib/widgets/quick_switch_bar.dart
+@@ -1,6 +1,8 @@
+ import 'dart:ui';
+ import 'package:flutter/material.dart';
+ import '../l10n/l10n.dart';
++import 'package:provider/provider.dart';
++import '../connector/meshcore_connector.dart';
+ class QuickSwitchBar extends StatelessWidget {
+   final int selectedIndex;
+   final ValueChanged<int> onDestinationSelected;
+@@ -53,6 +55,28 @@ class QuickSwitchBar extends StatelessWidget {
+                   NavigationDestination(
+                     icon: const Icon(Icons.map_outlined),
+                     label: context.l10n.nav_map,
+                   ),
++                  NavigationDestination(
++                    icon: Consumer<MeshCoreConnector>(
++                      builder: (context, connector, _) {
++                        switch (connector.state) {
++                          case MeshCoreConnectionState.connected:
++                            return const Icon(Icons.bluetooth_connected);
++                          case MeshCoreConnectionState.connecting:
++                          case MeshCoreConnectionState.scanning:
++                            return const SizedBox(
++                              width: 24,
++                              height: 24,
++                              child: CircularProgressIndicator(strokeWidth: 2),
++                            );
++                          default:
++                            return const Icon(Icons.bluetooth);
++                        }
++                      },
++                    ),
++                    selectedIcon: const Icon(Icons.bluetooth_connected),
++                    label: '连接',
++                  ),
++                  NavigationDestination(
++                    icon: const Icon(Icons.settings_outlined),
++                    selectedIcon: const Icon(Icons.settings),
++                    label: '设置',
++                  ),
+                 ],
+               ),
+             ),
+
+diff --git a/lib/screens/contacts_screen.dart b/lib/screens/contacts_screen.dart
+--- a/lib/screens/contacts_screen.dart
++++ b/lib/screens/contacts_screen.dart
+@@ -29,6 +29,7 @@ import '../widgets/unread_badge.dart';
+ import 'channels_screen.dart';
+ import 'chat_screen.dart';
+ import 'discovery_screen.dart';
++import 'scanner_screen.dart';
+ import 'map_screen.dart';
+ import 'repeater_hub_screen.dart';
+ import 'settings_screen.dart';
+@@ -388,6 +389,16 @@ class _ContactsScreenState extends State<ContactsScreen>
+       case 2:
+         Navigator.pushReplacement(
+           context,
+           buildQuickSwitchRoute(const MapScreen(hideBackButton: true)),
+         );
+         break;
++      case 3:
++        Navigator.push(
++          context,
++          MaterialPageRoute(builder: (context) => const ScannerScreen()),
++        );
++        break;
++      case 4:
++        Navigator.push(
++          context,
++          MaterialPageRoute(builder: (context) => const SettingsScreen()),
++        );
++        break;
+     }
+   }
+
+diff --git a/lib/screens/channels_screen.dart b/lib/screens/channels_screen.dart
+--- a/lib/screens/channels_screen.dart
++++ b/lib/screens/channels_screen.dart
+@@ -20,6 +20,7 @@ import '../widgets/empty_state.dart';
+ import '../widgets/qr_code_display.dart';
+ import '../widgets/quick_switch_bar.dart';
+ import '../widgets/unread_badge.dart';
++import 'scanner_screen.dart';
+ import 'channel_chat_screen.dart';
+ import 'community_qr_scanner_screen.dart';
+ import 'contacts_screen.dart';
+@@ -189,6 +190,16 @@ class _ChannelsScreenState extends State<ChannelsScreen>
+       case 2:
+         Navigator.pushReplacement(
+           context,
+           buildQuickSwitchRoute(const MapScreen(hideBackButton: true)),
+         );
+         break;
++      case 3:
++        Navigator.push(
++          context,
++          MaterialPageRoute(builder: (context) => const ScannerScreen()),
++        );
++        break;
++      case 4:
++        Navigator.push(
++          context,
++          MaterialPageRoute(builder: (context) => const SettingsScreen()),
++        );
++        break;
+     }
+   }
+
+diff --git a/lib/screens/map_screen.dart b/lib/screens/map_screen.dart
+--- a/lib/screens/map_screen.dart
++++ b/lib/screens/map_screen.dart
+@@ -29,6 +29,7 @@ import '../widgets/quick_switch_bar.dart';
+ import '../icons/los_icon.dart';
+ import 'channels_screen.dart';
+ import 'chat_screen.dart';
++import 'scanner_screen.dart';
+ import 'contacts_screen.dart';
+ import '../widgets/repeater_login_dialog.dart';
+ import '../widgets/room_login_dialog.dart';
+@@ -637,6 +638,16 @@ class _MapScreenState extends State<MapScreen> {
+       case 1:
+         Navigator.pushReplacement(
+           context,
+           buildQuickSwitchRoute(const ChannelsScreen(hideBackButton: true)),
+         );
+         break;
++      case 3:
++        Navigator.push(
++          context,
++          MaterialPageRoute(builder: (context) => const ScannerScreen()),
++        );
++        break;
++      case 4:
++        Navigator.push(
++          context,
++          MaterialPageRoute(builder: (context) => const SettingsScreen()),
++        );
++        break;
+     }
+   }
